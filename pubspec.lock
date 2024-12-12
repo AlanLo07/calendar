@@ -75,15 +75,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  heatmap_calendar_flutter:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "3fe92697b9fe8b5cf3dc2ee77a08f366737e4873"
-      url: "https://github.com/amias-samir/Heatmap-Calendar-Flutter.git"
-    source: git
-    version: "0.0.1"
   leak_tracker:
     dependency: transitive
     description:

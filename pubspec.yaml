@@ -30,10 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  heatmap_calendar_flutter:
-    git:
-      url: https://github.com/amias-samir/Heatmap-Calendar-Flutter.git
-      ref: master
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -60,6 +56,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/image1.JPG
+    - assets/image2.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
