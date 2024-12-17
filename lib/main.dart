@@ -21,18 +21,13 @@ class MonthNavigator extends StatefulWidget {
   HeatmapWithImages createState() => HeatmapWithImages();
 }
 
-class HeatmapWithImages extends State<MonthNavigator>
-    with SingleTickerProviderStateMixin {
+class HeatmapWithImages extends State<MonthNavigator> {
   // Datos de ejemplo
   final Map<DateTime, String> inputData = {
     DateTime(2024, 01, 01): 'assets/image1.JPG',
     DateTime(2024, 02, 01): 'assets/image2.jpg',
     DateTime(2024, 03, 01): '',
   };
-
-  // Controlador para la animación
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
 
   DateTime selectedDate = DateTime(2024, 01, 01);
 
@@ -54,27 +49,6 @@ class HeatmapWithImages extends State<MonthNavigator>
     setState(() {
       selectedDate = DateTime(selectedDate.year, selectedDate.month + 1, 1);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  void _onTapDown(TapDownDetails details) {
-    _controller.forward();
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    _controller.reverse();
   }
 
   final months = [
@@ -145,33 +119,106 @@ class HeatmapWithImages extends State<MonthNavigator>
               );
               String imagePath = inputData[date] ?? '';
 
-              return GestureDetector(
-                onTapDown: _onTapDown,
-                onTapUp: _onTapUp,
-                onTapCancel: () {
-                  _controller.reverse();
-                },
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Card(
-                    color:
-                        imagePath != '' ? Colors.blue[50] : Colors.grey[200],
-                    child:
-                        imagePath != ''
-                            ? Image.asset(imagePath, fit: BoxFit.cover)
-                            : Center(
-                              child: Text(
-                                "$day",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                  ),
-                ),
-              );
+              return AnimatedCard(day: day, imagePath: imagePath);
             },
           ),
         ),
       ],
+    );
+  }
+}
+
+class AnimatedCard extends StatefulWidget {
+  final int day;
+  final String? imagePath;
+
+  const AnimatedCard({required this.day, this.imagePath});
+
+  @override
+  _AnimatedCardState createState() => _AnimatedCardState();
+}
+
+class _AnimatedCardState extends State<AnimatedCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _rotationAnimation;
+
+  bool isFront = true; // Indica si estamos viendo el frente del Card
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 2.00,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void flipCard() {
+    if (isFront) {
+      _controller.forward(); // Gira hacia atrás
+    } else {
+      _controller.reverse(); // Gira hacia el frente
+    }
+    setState(() {
+      isFront = !isFront; // Cambia el estado (frente o reverso)
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: flipCard,
+      child: AnimatedBuilder(
+        animation: _rotationAnimation,
+        builder: (context, child) {
+          final angle = _rotationAnimation.value * 3.14159265359; // π radianes
+
+          return Transform(
+            alignment: Alignment.center,
+            transform:
+                Matrix4.identity()
+                  ..setEntry(3, 2, 0.001) // Perspectiva
+                  ..rotateY(angle),
+            child:
+                angle >
+                        1.5708 // Mayor a 90°: mostrar el reverso
+                    ? _buildBackCard()
+                    : _buildFrontCard(),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFrontCard() {
+    return Card(
+      color: widget.imagePath != '' ? Colors.blue[100] : Colors.grey[300],
+      child:
+          widget.imagePath != ''
+              ? Image.asset(widget.imagePath!, fit: BoxFit.cover)
+              : Center(
+                child: Text("${widget.day}", style: TextStyle(fontSize: 16)),
+              ),
+    );
+  }
+
+  Widget _buildBackCard() {
+    return Card(
+      color: Colors.white,
+      child: Center(
+        child: Text("Te amo como a los esquites", style: TextStyle(fontSize: 16)),
+      ),
     );
   }
 }
