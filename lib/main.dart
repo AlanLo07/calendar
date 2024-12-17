@@ -21,13 +21,18 @@ class MonthNavigator extends StatefulWidget {
   HeatmapWithImages createState() => HeatmapWithImages();
 }
 
-class HeatmapWithImages extends State<MonthNavigator> {
+class HeatmapWithImages extends State<MonthNavigator>
+    with SingleTickerProviderStateMixin {
   // Datos de ejemplo
   final Map<DateTime, String> inputData = {
     DateTime(2024, 01, 01): 'assets/image1.JPG',
     DateTime(2024, 02, 01): 'assets/image2.jpg',
     DateTime(2024, 03, 01): '',
   };
+
+  // Controlador para la animación
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   DateTime selectedDate = DateTime(2024, 01, 01);
 
@@ -49,6 +54,27 @@ class HeatmapWithImages extends State<MonthNavigator> {
     setState(() {
       selectedDate = DateTime(selectedDate.year, selectedDate.month + 1, 1);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller.reverse();
   }
 
   final months = [
@@ -111,6 +137,7 @@ class HeatmapWithImages extends State<MonthNavigator> {
               selectedDate.month,
             ), // Días del mes
             itemBuilder: (context, index) {
+              int day = index + 1;
               DateTime date = DateTime(
                 selectedDate.year,
                 selectedDate.month,
@@ -118,20 +145,28 @@ class HeatmapWithImages extends State<MonthNavigator> {
               );
               String imagePath = inputData[date] ?? '';
 
-              return Card(
-                color: Colors.grey[200],
-                child:
-                    imagePath.isNotEmpty
-                        ? Image.asset(imagePath, fit: BoxFit.cover)
-                        : Center(
-                          child: Text(
-                            "${date.day}",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+              return GestureDetector(
+                onTapDown: _onTapDown,
+                onTapUp: _onTapUp,
+                onTapCancel: () {
+                  _controller.reverse();
+                },
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Card(
+                    color:
+                        imagePath != '' ? Colors.blue[50] : Colors.grey[200],
+                    child:
+                        imagePath != ''
+                            ? Image.asset(imagePath, fit: BoxFit.cover)
+                            : Center(
+                              child: Text(
+                                "$day",
+                                style: TextStyle(fontSize: 14),
+                              ),
                             ),
-                          ),
-                        ),
+                  ),
+                ),
               );
             },
           ),
