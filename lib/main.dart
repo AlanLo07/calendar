@@ -203,7 +203,7 @@ class _AnimatedCardState extends State<AnimatedCard>
 
   Widget _buildFrontCard() {
     return Card(
-      color: widget.imagePath != '' ? Colors.blue[100] : Colors.grey[300],
+      color: widget.imagePath != '' ? Colors.blue[100] : Colors.purple[100],
       child:
           widget.imagePath != ''
               ? Image.asset(widget.imagePath!, fit: BoxFit.cover)
