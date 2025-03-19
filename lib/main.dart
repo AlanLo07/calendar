@@ -144,6 +144,28 @@ class _AnimatedCardState extends State<AnimatedCard>
   late Animation<double> _rotationAnimation;
 
   bool isFront = true; // Indica si estamos viendo el frente del Card
+  List frases = [
+    "Te amo mas que a los esquites",
+    "Te amo mas que a las vaquitas",
+    "Te amo mas que a las mantarrayas",
+    "Te amo mas que a los patos",
+    "Te amo mas que a las tortugas",
+    "Te amo mas que a los perritos",
+    "Te amo mas que a las patitas de pollo",
+    "Te amo mas que a las gorditas de nata",
+    "Te amo mas que a los tacos de arrachera",
+    "Te amo mas que a los tacos de pastor",
+    "Te amo mas que a los tacos de suadero",
+    "Te amo mas que a los tacos de tripa",
+    "Te amo mas que a los amaneceres",
+    "Te amo mas que a los atardeceres",
+    "Te amo mas que a la musica electronica",
+    "Te amo mas que a la musica de banda",
+    "Te amo mas que a Duki",
+    "Te amo mas que a los festivales de musica",
+    "Te amo mas que a One Piece",
+    "Te amo mas que a Spider Man"    
+  ];
 
   @override
   void initState() {
@@ -183,7 +205,7 @@ class _AnimatedCardState extends State<AnimatedCard>
         animation: _rotationAnimation,
         builder: (context, child) {
           final angle = _rotationAnimation.value * 3.14159265359; // π radianes
-
+          String frase = frases[0];//frases[random.nextInt(frases.length)];
           return Transform(
             alignment: Alignment.center,
             transform:
@@ -193,7 +215,7 @@ class _AnimatedCardState extends State<AnimatedCard>
             child:
                 angle >
                         1.5708 // Mayor a 90°: mostrar el reverso
-                    ? _buildBackCard()
+                    ? _buildBackCard(frase)
                     : _buildFrontCard(),
           );
         },
@@ -213,11 +235,12 @@ class _AnimatedCardState extends State<AnimatedCard>
     );
   }
 
-  Widget _buildBackCard() {
+
+  Widget _buildBackCard(frase) {
     return Card(
       color: Colors.white,
       child: Center(
-        child: Text("Te amo como a los esquites", style: TextStyle(fontSize: 16)),
+        child: Text(frase, style: TextStyle(fontSize: 16)),
       ),
     );
   }
