@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:math';
 void main() {
   runApp(MyApp());
 }
@@ -205,7 +205,8 @@ class _AnimatedCardState extends State<AnimatedCard>
         animation: _rotationAnimation,
         builder: (context, child) {
           final angle = _rotationAnimation.value * 3.14159265359; // π radianes
-          String frase = frases[0];//frases[random.nextInt(frases.length)];
+          final random = Random(widget.day);
+          String frase = frases[random.nextInt(frases.length)];
           return Transform(
             alignment: Alignment.center,
             transform:
